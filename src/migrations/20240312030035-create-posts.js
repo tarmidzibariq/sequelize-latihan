@@ -19,8 +19,12 @@ module.exports = {
         type: Sequelize.TEXT
       },
       thumbnail: {
-        allowNull: false,
-        type: Sequelize.BLOB
+        allowNull: true,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Files',
+          key: 'id',
+        },
       },
       status: {
         allowNull: false,

@@ -41,6 +41,10 @@ module.exports = {
       avatar: {
         allowNull: true,
         type: Sequelize.UUID,
+        references: {
+          model: 'Files',
+          key: 'id',
+        },
       },
       createdAt: {
         allowNull: false,

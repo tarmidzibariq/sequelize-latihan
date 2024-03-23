@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Posts.init({
     title: DataTypes.STRING,
     description: DataTypes.TEXT,
-    thumbnail: DataTypes.BLOB,
+    thumbnail: DataTypes.UUID,
     status: DataTypes.ENUM("Draft","Published"),
     slug: DataTypes.STRING
   }, {

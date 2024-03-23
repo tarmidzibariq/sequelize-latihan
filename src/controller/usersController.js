@@ -2,7 +2,7 @@ const { Users } = require("../models");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
 
-// const filesController = require('./filesController').store;
+const filesController = require('./filesController').store;
 class UsersController{
     async store(req, res){
         try {
@@ -38,9 +38,23 @@ class UsersController{
         }
     }
 
-    // async index(req, res) {
-        
-    // }
+    async index(req, res) {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.pageSize) || 10;
+        const offset = Number((page - 1) * limit) || 0;
+
+        const users = await Users.findAndCountAll({
+            offset: offset,
+            limit: limit,
+        });
+        // const totalUsers = await Users.count();
+        return res.json({
+            data : users.rows,
+            total : users.count,
+            page: Number(page) || 1,
+            pageSize: Number(limit),
+        });
+    }
     async show(req, res) {
         try {
             const { id } = req.params;
@@ -57,7 +71,7 @@ class UsersController{
     async update(req, res) {
         try {
             const { id } = req.params;
-            const { fullName, email, confirmNewPassword, newPassword, role, status } = req.body;
+            const { fullName, email, confirmNewPassword, newPassword, role, status, avatar } = req.body;
 
             let updateData = {};
 
@@ -82,6 +96,7 @@ class UsersController{
             if (fullName) updateData.fullName = fullName;
             if (role) updateData.role = role;
             if (status) updateData.status = status;
+            if (avatar) updateData.avatar = avatar;
             
 
             // Perbarui data pengguna jika ada data untuk diperbarui

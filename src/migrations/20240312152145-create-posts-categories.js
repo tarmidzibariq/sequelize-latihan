@@ -13,10 +13,18 @@ module.exports = {
       postId: {
         allowNull: false,
         type: Sequelize.UUID,
+        references: {
+          model: 'Posts',
+          key: 'id',
+        },
       },
       categoryId: {
         allowNull: false,
         type: Sequelize.UUID,
+        references: {
+          model: 'Categories',
+          key: 'id',
+        },
       },
       createdAt: {
         allowNull: false,
