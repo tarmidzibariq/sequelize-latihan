@@ -1,8 +1,8 @@
-const { Users } = require("../models");
+const { Users, Files } = require("../models");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
 
-const filesController = require('./filesController').store;
+// const filesController = require('./filesController').store;
 class UsersController{
     async store(req, res){
         try {
@@ -46,11 +46,15 @@ class UsersController{
         const users = await Users.findAndCountAll({
             offset: offset,
             limit: limit,
+            include: [{
+                model: Files,
+                as: 'Avatar' // Update the alias to match the association
+            }]
         });
-        // const totalUsers = await Users.count();
+
         return res.json({
-            data : users.rows,
-            total : users.count,
+            data: users.rows,
+            total: users.count,
             page: Number(page) || 1,
             pageSize: Number(limit),
         });
@@ -58,7 +62,13 @@ class UsersController{
     async show(req, res) {
         try {
             const { id } = req.params;
-            const data = await Users.findOne({ where: { id: id } });
+            const data = await Users.findOne({
+                where: { id: id },
+                include: [{
+                    model: Files,
+                    as: 'Avatar' // Update the alias to match the association
+                }]
+            });
             return res.json({
                 code: 200,
                 message: "Data Sudah Diterima",
@@ -106,7 +116,13 @@ class UsersController{
                 return res.status(400).json({ message: "No data provided for update" });
             }
 
-            const updatedData = await Users.findOne({ where: { id: id } });
+            const updatedData = await Users.findOne({
+                where: { id: id },
+                include: [{
+                    model: Files,
+                    as: 'Avatar' // Update the alias to match the association
+                }]
+            });
 
             return res.json({
                 code: 200,
@@ -114,6 +130,18 @@ class UsersController{
                 updatedData
             });
             
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    }
+    async delete(req, res) {
+        try {
+            const { id } = req.params;
+            const data = await Users.destroy({ where: { id: id } });
+            return res.json({
+                code: 200,
+                message: "Data Berhasil Dihapus",
+            });
         } catch (error) {
             return res.status(400).json({ message: error.message });
         }
