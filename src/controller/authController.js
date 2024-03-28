@@ -23,12 +23,19 @@ class authController {
         try {
             // check if email is valid
             const user = await Users.findOne({
-                where: { email: req.body.email },
-                include: [{
-                    model: Files,
-                    as: 'Avatar' // Update the alias to match the association
-                }]
+                where: { email: req.body.email }
+                // include: [{
+                //     model: Files,
+                //     as: 'Avatar' // Update the alias to match the association
+                // }]
             });
+            // Email validation regex
+            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+            // Inside the login method, after retrieving the email from req.body.email, add this check:
+            if (!emailRegex.test(req.body.email)) {
+                return res.status(400).json({ message: "INVALID_EMAIL_FORMAT" });
+            }
 
             if (!user) {
                 return res.status(400).json({ message: "USER_NOT_FOUND" });
@@ -46,10 +53,11 @@ class authController {
 
             return res.status(200).json({
                 code: 200,
-                expiresIn: env.JWT_ACCESS_TOKEN_EXPIRES_IN,
                 message: "Berhasil masuk",
                 accessToken: accessToken,
                 refreshToken: refreshToken,
+                expiresIn: env.JWT_ACCESS_TOKEN_EXPIRES_IN,
+                tokenType: "Bearer",
                 user
             })
 
