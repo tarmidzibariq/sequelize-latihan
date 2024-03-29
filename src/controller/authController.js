@@ -65,5 +65,34 @@ class authController {
             return res.status(400).json({ message: error.message });
         }
     }
+    
+    profile = async (req, res) => {
+        try {
+            const token = req.header("Authorization").split(" ")[1];
+
+            const verified = jwt.verify(token,process.env.JWT_ACCESS_TOKEN_SECRET);
+            if (!verified) {
+                throw { message: "UNAUTHORIZED" }
+            }
+            const user = await Users.findOne({
+                where: { id: verified.userId },
+                attributes: { exclude: ['password'] },
+                include: [{
+                    model: Files,
+                    as: 'Avatar' // Update the alias to match the association
+                }]
+            });
+            // console.log(user.toJSON()); // This will show you the full structure of the user object, including associations
+
+            return res.status(200).json({
+                code: 200,
+                message: "Data sudah diterima",
+                user
+            });
+
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    }
 }
 module.exports = new authController();
