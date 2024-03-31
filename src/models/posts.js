@@ -11,14 +11,32 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.PostsCategories, { foreignKey: 'postId', as: 'categoryAssociations' });
+
     }
   }
   Posts.init({
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     title: DataTypes.STRING,
     description: DataTypes.TEXT,
     thumbnail: DataTypes.UUID,
     status: DataTypes.ENUM("Draft","Published"),
-    slug: DataTypes.STRING
+    slug: DataTypes.STRING,
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    deletedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Posts',

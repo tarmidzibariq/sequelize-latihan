@@ -4,6 +4,7 @@ const files = require("./router/Files.js");
 const categories = require("./router/Categories.js");
 const users = require("./router/Users.js");
 const auth = require("./router/Auth.js");
+const posts = require("./router/Posts.js");
 
 
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use("/v1/upload", files);
 app.use("/v1/categories", categories );
 app.use("/v1/users", users );
 app.use("/v1/auth", auth );
+app.use("/v1/posts", posts );
 
 
 app.get('/', (req, res) => {

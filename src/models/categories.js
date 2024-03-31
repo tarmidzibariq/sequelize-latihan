@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.PostsCategories, { foreignKey: 'categoryId', as: 'relatedPostsCategories' });
     }
   }
   Categories.init({
@@ -20,6 +21,16 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
     },
     title: DataTypes.STRING,
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
     deletedAt: DataTypes.DATE
   }, {
     sequelize,
