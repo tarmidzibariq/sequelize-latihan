@@ -21,7 +21,7 @@ module.exports = {
           id:"22dc7a19-85d2-4fa0-9011-087dba7105ad",
           fullName: "admin",
           email: "admin@wegodev.com",
-          role:"Super Admin",
+          role:"SuperAdmin",
           password: bcrypt.hashSync("password", 10),
           status:"Active",
           avatar:null,

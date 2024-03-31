@@ -22,7 +22,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.ENUM,
         values: [
-          "Super Admin",
+          "SuperAdmin",
           "Creator"
         ]
       },

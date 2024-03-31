@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     fullName: DataTypes.STRING,
     email:    DataTypes.STRING,
-    role:     DataTypes.ENUM("Super Admin", "Creator"),
+    role:     DataTypes.ENUM("SuperAdmin", "Creator"),
     password: DataTypes.STRING,
     status:   DataTypes.ENUM("Active", "Suspend"),
     avatar:   DataTypes.UUID,

@@ -18,7 +18,7 @@ module.exports = {
        users.push({
          id:faker.string.uuid(),
          fullName: faker.person.fullName(),
-         role: faker.helpers.arrayElement(['Super Admin', 'Creator']),
+         role: faker.helpers.arrayElement(['SuperAdmin', 'Creator']),
          email: faker.internet.email(),
          password: faker.internet.password(),
          status: faker.helpers.arrayElement(['Active', 'Suspend']),

@@ -3,6 +3,7 @@ const router = express.Router();
 const usersController = require('../controller/usersController.js');
 const auth = require("../middleware/auth.js");
 const isSuperAdmin =  require("../middleware/superAdmin.js");
+const isCreator =  require("../middleware/creator.js");
 
 router.post("/", [auth(), isSuperAdmin()], usersController.store);
 router.get("/", [auth(), isSuperAdmin()], usersController.index);

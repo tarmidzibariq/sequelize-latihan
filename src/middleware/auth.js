@@ -15,7 +15,7 @@ const auth = () => {
             if (!verified) {
                 throw { message: "UNAUTHORIZED" }
             }
-            const user = await Users.findOne({ where: verified.userID });
+            const user = await Users.findOne({ where: { id: verified.userId } });
             // ini nanti dipakai dicontroller
             req.user = {
                 id: user.id,

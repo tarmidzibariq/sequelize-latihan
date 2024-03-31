@@ -1,7 +1,8 @@
-const isUser = () => {
+const isSuperAdmin = () => {
   return (req, res, next) => {
+    console.log(req.user);
     try {
-      if (req.user.role !== "Super Admin") {
+      if (req.user.role !== "SuperAdmin") {
         throw { code: 403, message: "Forbidden!" };
       }
 
@@ -13,4 +14,4 @@ const isUser = () => {
   };
 };
 
-module.exports = isUser;
+module.exports = isSuperAdmin;

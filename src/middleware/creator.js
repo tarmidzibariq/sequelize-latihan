@@ -1,4 +1,4 @@
-const isUser = () => {
+const isCreator = () => {
   return (req, res, next) => {
     try {
       if (req.user.role !== "Creator") {
@@ -13,4 +13,4 @@ const isUser = () => {
   };
 };
 
-module.exports = isUser;
+module.exports = isCreator;
