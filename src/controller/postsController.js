@@ -49,77 +49,125 @@ class postsController{
         }
     }
     index = async (req, res) => {
-    try {
-        const page = Number(req.query.page) || 1;
-        const pageSize = Number(req.query.pageSize) || 3;
-        const offset = (page - 1) * pageSize;
+        try {
+            const page = Number(req.query.page) || 1;
+            const pageSize = Number(req.query.pageSize) || 3;
+            const offset = (page - 1) * pageSize;
 
-        const { count, rows } = await Posts.findAndCountAll({
-            offset: offset,
-            limit: pageSize,
-            include: [{
-                model: PostsCategories,
-                as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
+            const { count, rows } = await Posts.findAndCountAll({
+                offset: offset,
+                limit: pageSize,
                 include: [{
-                    model: Categories,
-                    as: 'relatedPostsCategories', // This alias should match the one defined in your association
-                }]
-            }],
-            distinct: true
-        });
+                    model: PostsCategories,
+                    as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
+                    include: [{
+                        model: Categories,
+                        as: 'relatedPostsCategories', // This alias should match the one defined in your association
+                    }]
+                }],
+                distinct: true
+            });
 
-        // Using for loop to format the response
-        const responseData = [];
-        for (let i = 0; i < rows.length; i++) {
-            const post = rows[i];
-            const categoryData = [];
-            for (let j = 0; j < post.categoryAssociations.length; j++) {
-                const pc = post.categoryAssociations[j];
-                categoryData.push({
-                    id: pc.relatedPostsCategories.id,
-                    title: pc.relatedPostsCategories.title,
-                    createdAt: pc.relatedPostsCategories.createdAt,
-                    updatedAt: pc.relatedPostsCategories.updatedAt,
-                    deletedAt: pc.relatedPostsCategories.deletedAt,
-                    PostCategories: {
-                        id: pc.id,
-                        postId: pc.postId,
-                        categoryId: pc.categoryId,
-                        createdAt: pc.createdAt,
-                        updatedAt: pc.updatedAt,
-                        deletedAt: pc.deletedAt
-                    }
+            // Using for loop to format the response
+            const responseData = [];
+            for (let i = 0; i < rows.length; i++) {
+                const post = rows[i];
+                const categoryData = [];
+                for (let j = 0; j < post.categoryAssociations.length; j++) {
+                    const pc = post.categoryAssociations[j];
+                    categoryData.push({
+                        id: pc.relatedPostsCategories.id,
+                        title: pc.relatedPostsCategories.title,
+                        createdAt: pc.relatedPostsCategories.createdAt,
+                        updatedAt: pc.relatedPostsCategories.updatedAt,
+                        deletedAt: pc.relatedPostsCategories.deletedAt,
+                        PostCategories: {
+                            id: pc.id,
+                            postId: pc.postId,
+                            categoryId: pc.categoryId,
+                            createdAt: pc.createdAt,
+                            updatedAt: pc.updatedAt,
+                            deletedAt: pc.deletedAt
+                        }
+                    });
+                }
+                responseData.push({
+                    id: post.id,
+                    title: post.title,
+                    description: post.description,
+                    thumbnail: post.thumbnail,
+                    status: post.status,
+                    slug: post.slug,
+                    createdAt: post.createdAt,
+                    updatedAt: post.updatedAt,
+                    deletedAt: post.deletedAt,
+                    Thumbnail: post.Thumbnail,
+                    Categories: categoryData
                 });
             }
-            responseData.push({
-                id: post.id,
-                title: post.title,
-                description: post.description,
-                thumbnail: post.thumbnail,
-                status: post.status,
-                slug: post.slug,
-                createdAt: post.createdAt,
-                updatedAt: post.updatedAt,
-                deletedAt: post.deletedAt,
-                Thumbnail: post.Thumbnail,
-                Categories: categoryData
+
+            return res.json({
+                code: 200,
+                message: `${count} Data Sudah Diterima`,
+                count: count,
+                page: page,
+                pageSize: pageSize,
+                data: responseData,
             });
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
         }
-
-        return res.json({
-            code: 200,
-            message: `${count} Data Sudah Diterima`,
-            count: count,
-            page: page,
-            pageSize: pageSize,
-            data: responseData,
-        });
-    } catch (error) {
-        return res.status(400).json({ message: error.message });
     }
-}
 
+    slug = async (req, res) => {
+        try {
+            const { slug } = req.params;
+            const data = await Posts.findOne({
+                where: { slug: slug },
+                include: [{
+                    model: PostsCategories,
+                    as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
+                    include: [{
+                        model: Categories,
+                        as: 'relatedPostsCategories', // This alias should match the one defined in your association
+                    }]
+                }],
+                distinct: true
+            });
+            return res.json({   
+                code: 200,
+                message: "Data Sudah Diterima",
+                data
+            });
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    }
 
+    show = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const data = await Posts.findOne({
+                where: { id: id },
+                include: [{
+                    model: PostsCategories,
+                    as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
+                    include: [{
+                        model: Categories,
+                        as: 'relatedPostsCategories', // This alias should match the one defined in your association
+                    }]
+                }],
+                distinct: true
+            });
+            return res.json({   
+                code: 200,
+                message: "Data Sudah Diterima",
+                data
+            });
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    }
 
 }
 
