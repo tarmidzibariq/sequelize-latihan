@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasOne(models.Users,{ foreignKey: 'avatar', as: 'Avatar' });
+      this.hasOne(models.Posts,{ foreignKey: 'thumbnail', as: 'Thumbnail' });
     }
   }
   Files.init({

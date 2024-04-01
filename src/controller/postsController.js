@@ -1,4 +1,4 @@
-const { Posts, PostsCategories, Categories } = require("../models");
+const { Posts, PostsCategories, Categories, Files } = require("../models");
 
 class postsController{
     titleToSlug = async (title) => {
@@ -57,14 +57,20 @@ class postsController{
             const { count, rows } = await Posts.findAndCountAll({
                 offset: offset,
                 limit: pageSize,
-                include: [{
-                    model: PostsCategories,
-                    as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
-                    include: [{
-                        model: Categories,
-                        as: 'relatedPostsCategories', // This alias should match the one defined in your association
-                    }]
-                }],
+                include: [
+                    {
+                        model: Files,
+                        as: 'Thumbnail', // Make sure this alias matches the one used in your associations
+                        
+                    },
+                    {
+                        model: PostsCategories,
+                        as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
+                        include: [{
+                            model: Categories,
+                            as: 'relatedPostsCategories', // This alias should match the one defined in your association
+                        }]
+                    }],
                 distinct: true
             });
 
@@ -124,14 +130,20 @@ class postsController{
             const { slug } = req.params;
             const data = await Posts.findOne({
                 where: { slug: slug },
-                include: [{
-                    model: PostsCategories,
-                    as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
-                    include: [{
-                        model: Categories,
-                        as: 'relatedPostsCategories', // This alias should match the one defined in your association
-                    }]
-                }],
+                include: [
+                    {
+                        model: Files,
+                        as: 'Thumbnail', // Make sure this alias matches the one used in your associations
+                        
+                    },
+                    {
+                        model: PostsCategories,
+                        as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
+                        include: [{
+                            model: Categories,
+                            as: 'relatedPostsCategories', // This alias should match the one defined in your association
+                        }]
+                    }],
                 distinct: true
             });
             return res.json({   
@@ -149,20 +161,92 @@ class postsController{
             const { id } = req.params;
             const data = await Posts.findOne({
                 where: { id: id },
-                include: [{
-                    model: PostsCategories,
-                    as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
-                    include: [{
-                        model: Categories,
-                        as: 'relatedPostsCategories', // This alias should match the one defined in your association
-                    }]
-                }],
+                include: [
+                    {
+                        model: Files,
+                        as: 'Thumbnail', // Make sure this alias matches the one used in your associations
+                        
+                    },
+                    {
+                        model: PostsCategories,
+                        as: 'categoryAssociations', // Make sure this alias matches the one used in your associations
+                        include: [{
+                            model: Categories,
+                            as: 'relatedPostsCategories', // This alias should match the one defined in your association
+                        }]
+                    }],
                 distinct: true
             });
             return res.json({   
                 code: 200,
                 message: "Data Sudah Diterima",
                 data
+            });
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    }
+    
+    update = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { title, description,thumbnail, categoryId, status } = req.body;
+            const slug = await this.titleToSlug(title);
+
+            let updateData = {};
+            if (title) {
+                updateData.title = title;
+                updateData.slug = slug;
+            }
+            if (description) updateData.description = description;
+            if (categoryId) {
+                const categoryIds = Array.isArray(categoryId) ? categoryId : [categoryId];
+
+                // Langkah 1: Hapus hubungan PostsCategories yang ada untuk post ini
+                await PostsCategories.destroy({
+                    where: { postId: id }
+                });
+
+                // Langkah 2: Tambahkan hubungan baru berdasarkan categoryId yang diberikan
+                for (const catId of categoryIds) {
+                    await PostsCategories.create({
+                        postId: id,
+                        categoryId: catId,
+                    });
+                }
+            }
+            // console.log(updateData);
+            if (status) updateData.status = status;
+            if (thumbnail) updateData.thumbnail = thumbnail;
+
+            if (Object.keys(updateData).length > 0) {
+                await Posts.update(updateData, { where: { id: id } });
+            } else {
+                return res.status(400).json({ message: "No data provided for update" });
+            }
+            // console.log(updateData);
+            const updatedData = await Posts.findOne({
+                where: { id: id },
+            });
+            return res.json({
+                code: 200,
+                message: "Data berhasil diperbarui",
+                updatedData
+            });
+
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    }
+
+    destroy = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const dataPostsCategories =  await PostsCategories.destroy({where: { postId: id }});
+            const dataPost = await Posts.destroy({ where: { id: id } });
+            return res.json({
+                code: 200,
+                message: "Data Berhasil Dihapus",
             });
         } catch (error) {
             return res.status(400).json({ message: error.message });
